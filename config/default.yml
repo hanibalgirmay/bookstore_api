@@ -1,0 +1,10 @@
+server:
+  port: 3000
+
+db:
+  type: 'postgres'
+  port: '5432'
+  database: 'fullstack_dev'
+
+jwt:
+  expriresIn: 3600
