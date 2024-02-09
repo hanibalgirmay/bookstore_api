@@ -4,6 +4,7 @@ import { BookService } from '../service/book.service';
 import { IdParamValidation } from 'src/utils/decorators/IdParamValidation ';
 import { CreateBooksDto } from '../dto/create-book.dto';
 import { Response as ResponseType } from '../../../utils/enums/response.enum';
+import { TagsEnum } from 'src/utils/enums/tags.enum';
 
 @Controller('book')
 export class BookController {
@@ -19,9 +20,14 @@ export class BookController {
         @Res() response,
         @Query('page') page: number,
         @Query('searchTitle') searchTitle: string,
+        @Query('tags') tags: TagsEnum[],
         @Query('limit') limit: number,) {
         try {
-            const users = await this.bookService.findAll(page, limit,searchTitle);
+            if (typeof tags === 'string') {
+                // If tags is a string, convert it to an array
+                tags = [tags];
+            }
+            const users = await this.bookService.findAll(page, limit, searchTitle, tags);
             return response.status(HttpStatus.OK).json({
                 type: ResponseType.SUCCESS,
                 message: null,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable prettier/prettier */
 import { Injectable, Logger } from '@nestjs/common';
 import { BookRepository } from '../repository/book.repository';
@@ -10,7 +11,7 @@ export class BookService {
     private logger = new Logger(BookService.name);
     constructor(private readonly bookRepository: BookRepository) { }
 
-    async findAll(page: number, limit: number, searchTitle?: string): Promise<Books[]> {
+    async findAll(page: number = 1, limit: number = 10, searchTitle?: string, tags?: TagsEnum[]): Promise<Books[]> {
         try {
             let books = await this.bookRepository.findAll(page, limit);
             if (searchTitle) {
@@ -19,6 +20,14 @@ export class BookService {
             } else {
                 books = await this.bookRepository.findAll(page, limit);
             }
+
+            if (tags && tags.length > 0) {
+                books = books.filter((book) => {
+                    // Filter books based on the tags array
+                    return tags.some((tag) => book.tags.toString() === tag);
+                });
+            }
+
 
             if (books?.length === 0) {
                 throw new Error('No record found.');
@@ -33,18 +42,18 @@ export class BookService {
 
     async findByTitleRegex(regexPattern: RegExp, page: number, limit: number): Promise<Books[]> {
         try {
-          const books = await this.bookRepository
-            .createQueryBuilder('book')
-            .where('book.title ILIKE :title', { title: `%${regexPattern.source}%` })
-            .skip((page - 1) * limit)
-            .take(limit)
-            .getMany();
-      
-          return books;
+            const books = await this.bookRepository
+                .createQueryBuilder('book')
+                .where('book.title ILIKE :title', { title: `%${regexPattern.source}%` })
+                .skip((page - 1) * limit)
+                .take(limit)
+                .getMany();
+
+            return books;
         } catch (error) {
-          throw new Error('Error finding books by title regex.');
+            throw new Error('Error finding books by title regex.');
         }
-      }
+    }
 
     async generateBookJson() {
         const bookData = [];
