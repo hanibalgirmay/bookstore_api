@@ -7,8 +7,12 @@ const url = 'https://www.amazon.com/books-used-books-textbooks/b?ie=UTF8&node=28
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getHello() {
+    return {
+      message: "Bookstore API is running",
+      author: "Hanibal Girmay",
+      doc: '/docs'
+    };
   }
 
   async getBookFromAmazon() {
